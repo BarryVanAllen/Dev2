@@ -11,21 +11,21 @@ class Fraction:
     def __init__(self, num=0, den=1):
         """This builds a fraction based on some numerator and denominator.
 
-        PRE : num et den sont chacun un entier
-        POST : initialise num, den et la fraction qu'ils composent
-        RAISE: si den = 0 ou str : renvoie une exception
+        PRE : num et den sont des entiers.
+        POST : initialise num, den.
+                si den < 0 : appel fonction pour le rendre positif.
+        RAISE: si den = 0 ou str : renvoie une exception.
+                si le den ou le num n'est pas un entier : renvoie une excpetion.
         """
+
+        if not isinstance(num, int) or not isinstance(den, int):
+            raise TypeError("Numerator and denominator must be integers")
+        if den == 0 :
+            raise ZeroDivisionError("Denominator cannot be 0")
+
         self.num = num
         self.den = den
-        self.fraction = f"{self.num}/{self.den}"
-
-        if self.den == 0 :
-            raise ZeroDivisionError("Denominator cannot be 0")
-        if type(self.num) == str or type(self.den) == str:
-            raise TypeError("Numerator and denominator must be strings")
-
-
-
+        self.den_pas_negatif()
 
 
 
@@ -37,13 +37,36 @@ class Fraction:
     def denominator(self):
         return self.den
 
+
+    def den_pas_negatif(self):
+        """s'assure que le dénominateur soit > 0 .
+
+        PRE: une fraction valide.
+        POST : si den < 0 : on le rend positif.
+        """
+        if self.den < 0: #pour que den soit toujours positif
+            self.num = -self.num
+            self.den = -self.den
+
+    # méthode ajouté pour simlifier la fraction une fois plutôt que plusieurs fois à travers toute les autres méthodes
+    def reduce(self,):
+        """simplifie la fraction au maximum
+
+        PRE: une fraction valide.
+        POST : la fraction simplifié au maximum.
+        """
+        common_divisor = gcd(self.num, self.den)
+        self.num //= common_divisor
+        self.den //= common_divisor
+
+
     # ------------------ Textual representations ------------------
 
     def __str__(self):
         """Return a textual representation of the reduced form of the fraction
 
-        PRE : le num et den sont initialisé
-        POST : renvoie le num et den sous forme de fraction
+        PRE : une fraction valide.
+        POST : renvoie une string sous la forme "num/den"
         """
         return f"{self.num}/{self.den}"
 
@@ -52,9 +75,9 @@ class Fraction:
 
         A mixed number is the sum of an integer and a proper fraction
 
-        PRE : la fraction initialisé
-        POST : renvoie la fraction sous forme nombre mix
-                si le numerateur = 0 alors la fraction = 0
+        PRE : une fraction valide.
+        POST : renvoie la fraction sous forme nombre mix si c'est possible.
+                si le numerateur = 0 alors la fraction = 0.
         """
 
         # Ajuster le calcul de la partie entière
@@ -75,7 +98,7 @@ class Fraction:
     def __add__(self, other):
         """Overloading of the + operator for fractions
 
-         PRE : prend deux fractions
+         PRE : self et other sont des fraction valide.
          POST : renvoie l'addition simplifié des deux fractions
                 si le résultat final donne numerateur = 0 alors la fraction = 0
          """
@@ -85,85 +108,62 @@ class Fraction:
         numerateur = nbr1 + nbr2
         denominateur = self.den * other.den
 
-    #simplifie
-        diviseur = gcd(numerateur, denominateur)
-
-        numerateur_simplifie = numerateur // diviseur
-        denominateur_simplifie = denominateur // diviseur
-        if numerateur_simplifie == 0 :
-            return f"0"
-        else:
-            return f"{numerateur_simplifie}/{denominateur_simplifie}"
+        resultat = Fraction(numerateur, denominateur)
+        resultat.reduce()
+        return resultat
 
 
     def __sub__(self, other):
         """Overloading of the - operator for fractions
 
-        PRE : prend deux fractions
-        POST : renvoie le resultat de la soustraction simplifié des deux fractions
-                si le résultat final donne numerateur = 0 alors la fraction = 0
+        PRE : self et other sont deux fraction valide.
+        POST : renvoie le resultat de la soustraction simplifié des deux fractions.
+                si le résultat final donne numerateur = 0 alors la fraction = 0.
         """
         nbr1 = self.den * other.num  # 3*2
         nbr2 = self.num * other.den  # 1*6
         numerateur = nbr1 - nbr2
         denominateur = self.den * other.den
 
-        # simplifie
-        diviseur = gcd(numerateur, denominateur)
-
-        numerateur_simplifie = numerateur // diviseur
-        denominateur_simplifie = denominateur // diviseur
-        if numerateur_simplifie == 0:
-            return f"0"
-        else:
-            return f"{numerateur_simplifie}/{denominateur_simplifie}"
+        resultat = Fraction(numerateur, denominateur)
+        resultat.reduce()
+        return resultat
 
     def __mul__(self, other):
         """Overloading of the * operator for fractions
 
-        PRE : prend deux fractions
-        POST : renvoie le resultat de la multiplication simplifié des deux fractions
-                si le résultat final donne numerateur = 0 alors la fraction = 0
+        PRE : self et other sont des fraction valide.
+        POST : renvoie le resultat de la multiplication simplifié des deux fractions.
+                si le résultat final donne numerateur = 0 alors la fraction = 0.
         """
         numerateur = self.num * other.num
         denominateur = self.den * other.den
 
-        diviseur = gcd(numerateur, denominateur)
-
-        numerateur_simplifie = numerateur // diviseur
-        denominateur_simplifie = denominateur // diviseur
-
-        if numerateur_simplifie == 0:
-            return f"0"
-        else:
-            return f"{numerateur_simplifie}/{denominateur_simplifie}"
+        resultat = Fraction(numerateur, denominateur)
+        resultat.reduce()
+        return resultat
 
     def __truediv__(self, other):
         """Overloading of the / operator for fractions
 
-        PRE : prend deux fractions
-        POST : renvoie le resultat de la division simplifié des deux fractions
-                si le résultat final donne numerateur = 0 alors la fraction = 0
+        PRE : self et other sont des fraction valide.
+        POST : renvoie le resultat de la division simplifié des deux fractions.
+                si le résultat final donne numerateur = 0 alors la fraction = 0.
         """
         numerateur = self.num * other.den
         denominateur = self.den * other.num
 
-        diviseur = gcd(numerateur, denominateur)
+        resultat = Fraction(numerateur, denominateur)
+        resultat.reduce()
+        return resultat
 
-        numerateur_simplifie = numerateur // diviseur
-        denominateur_simplifie = denominateur // diviseur
-
-        if numerateur_simplifie == 0:
-            return f"0"
-        else:
-            return f"{numerateur_simplifie}/{denominateur_simplifie}"
 
     def __pow__(self, other):
         """
         Overloading of the ** operator for fractions
 
         PRE:
-            - `other` est un entier
+            - `other` est un entier.
         POST:
             - Renvoie une nouvelle fraction qui est la puissance de la fraction actuelle.
             - Si `other` < 0 : calcule l'inverse avant d'élever à la puissance.
@@ -211,10 +211,11 @@ class Fraction:
     def __float__(self):
         """Returns the decimal value of the fraction
 
-        PRE : ?
-        POST : ?
+        PRE : la fraction
+        POST : un nombre flottant
         """
-        pass
+        nbr = self.num / self.den
+        return f"{nbr:.1f}"
 
     # TODO : [BONUS] You can overload other operators if you wish (ex : <, >, ...)
 
@@ -223,18 +224,20 @@ class Fraction:
     def is_zero(self):
         """Check if a fraction's value is 0
 
-        PRE : ?
-        POST : ?
+        PRE : la fraction
+        POST : si fraction = 0 : True
+                sinon False
         """
-        pass
+        return self.num / self.den == 0
 
     def is_integer(self):
         """Check if a fraction is integer (ex : 8/4, 3, 2/2, ...)
 
-        PRE : ?
-        POST : ?
+        PRE : la fraction
+        POST : si fraction est un entier (nul, positif ou négatif) : True
+                sinon : False
         """
-        pass
+        return self.num % self.den == 0
 
     def is_proper(self):
         """Check if the absolute value of the fraction is < 1
@@ -242,27 +245,31 @@ class Fraction:
         PRE : ?
         POST : ?
         """
+        self.__post_process()  # Appel la méthode pour simplifier
+        return abs(self.num) < abs(self.den)
 
     def is_unit(self):
         """Check if a fraction's numerator is 1 in its reduced form
 
-        PRE : ?
-        POST : ?
+        PRE : la fraction simplifié
+        POST : si num == 1 : True
+                si num != 1 : False
         """
-        pass
+        resultat = Fraction(self.num, self.den)
+        resultat.reduce()
+        return self.num == 1
 
     def is_adjacent_to(self, other):
         """Check if two fractions differ by a unit fraction
 
         Two fractions are adjacents if the absolute value of the difference them is a unit fraction
 
-        PRE : ?
-        POST : ?
+        PRE : self et other sont deux fractions valides.
+        POST : Si la différence absolue des fractions est une fraction unitaire : renvoie True
+                sinon : renvoie False
         """
-        pass
-
-
-unQuart = Fraction(1,1)
-deuxQuart = Fraction(4,2)
-test = unQuart.__eq__(1)
-print(test)
+        if not isinstance(other, Fraction):
+            raise TypeError("Argument must be a Fraction")
+        difference = abs(self.num * other.den - other.num * self.den)
+        common_denominator = self.den * other.den
+        return difference == 1 and common_denominator != 0
