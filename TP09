@@ -138,7 +138,6 @@ class Fraction:
         denominateur = self.den * other.den
 
         resultat = Fraction(numerateur, denominateur)
-        resultat.reduce()
         return resultat
 
     def __truediv__(self, other):
