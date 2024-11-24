@@ -103,8 +103,8 @@ class Fraction:
                 si le résultat final donne numerateur = 0 alors la fraction = 0
          """
     #additionne les deux
-        nbr1 = self.den * other.num  #3*2
-        nbr2 = self.num * other.den #1*6
+        nbr1 = self.den * other.num
+        nbr2 = self.num * other.den
         numerateur = nbr1 + nbr2
         denominateur = self.den * other.den
 
@@ -120,9 +120,7 @@ class Fraction:
         POST : renvoie le resultat de la soustraction simplifié des deux fractions.
                 si le résultat final donne numerateur = 0 alors la fraction = 0.
         """
-        nbr1 = self.den * other.num  # 3*2
-        nbr2 = self.num * other.den  # 1*6
-        numerateur = nbr1 - nbr2
+        numerateur = self.num * other.den - other.num * self.den
         denominateur = self.den * other.den
 
         resultat = Fraction(numerateur, denominateur)
@@ -146,7 +144,7 @@ class Fraction:
     def __truediv__(self, other):
         """Overloading of the / operator for fractions
 
-        PRE : self et other sont des fraction valide.
+        PRE : self et other sont des fractions valide.
         POST : renvoie le resultat de la division simplifié des deux fractions.
                 si le résultat final donne numerateur = 0 alors la fraction = 0.
         """
@@ -162,12 +160,10 @@ class Fraction:
         """
         Overloading of the ** operator for fractions
 
-        PRE:
-            - `other` est un entier.
-        POST:
-            - Renvoie une nouvelle fraction qui est la puissance de la fraction actuelle.
-            - Si `other` < 0 : calcule l'inverse avant d'élever à la puissance.
-            - Si `other` = zéro, renvoie 1/1.
+        PRE: self est une fraction valide et `other` est un entier.
+        POST: Renvoie une nouvelle fraction qui est la puissance de la fraction actuelle.
+                Si `other` < 0 : calcule l'inverse avant d'élever à la puissance.
+                Si `other` = zéro, renvoie 1/1.
         RAISE:
             - ValueError si la fraction est 0/1 et la puissance est négative .
         """
@@ -184,10 +180,10 @@ class Fraction:
     def __eq__(self, other):
         """Overloading of the == operator for fractions
 
-        PRE:`other` est une fraction ou un entier
+        PRE:self : Une fraction valide et `other` est une fraction ou un entier
 
-        POST: Renvoie `True` si les deux fractions sont égales quand simplifié.
-              Renvoie `False` sinon.
+        POST: si self == other : renvoie True.
+            sinon renvoie False.
 
         RAISE: 'other' n'est pas une fraction ou un entier
         """
@@ -211,11 +207,11 @@ class Fraction:
     def __float__(self):
         """Returns the decimal value of the fraction
 
-        PRE : la fraction
+        PRE : Une fraction valide
         POST : un nombre flottant
         """
         nbr = self.num / self.den
-        return f"{nbr:.1f}"
+        return nbr
 
     # TODO : [BONUS] You can overload other operators if you wish (ex : <, >, ...)
 
@@ -224,34 +220,38 @@ class Fraction:
     def is_zero(self):
         """Check if a fraction's value is 0
 
-        PRE : la fraction
+        PRE : Une fraction valide
         POST : si fraction = 0 : True
                 sinon False
         """
+        self.reduce()
         return self.num / self.den == 0
 
     def is_integer(self):
         """Check if a fraction is integer (ex : 8/4, 3, 2/2, ...)
 
-        PRE : la fraction
+        PRE : Une fraction valide
         POST : si fraction est un entier (nul, positif ou négatif) : True
                 sinon : False
         """
+        self.reduce()
         return self.num % self.den == 0
 
     def is_proper(self):
         """Check if the absolute value of the fraction is < 1
 
-        PRE : ?
-        POST : ?
+        PRE: Une fraction valide
+        POST: si |fraction| < 1 : True
+            si |fraction| >= 1 : False
+
         """
-        self.__post_process()  # Appel la méthode pour simplifier
+        self.reduce()
         return abs(self.num) < abs(self.den)
 
     def is_unit(self):
         """Check if a fraction's numerator is 1 in its reduced form
 
-        PRE : la fraction simplifié
+        PRE : Une fraction valide
         POST : si num == 1 : True
                 si num != 1 : False
         """
