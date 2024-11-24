@@ -1,0 +1,34 @@
+from TP09 import Fraction
+
+unQuart = Fraction(1,4)
+deuxQuart = Fraction(2,4)
+
+# __add__
+test1 = unQuart.__add__(deuxQuart)
+print(test1)
+
+#autre forme d'écriture :
+resultat = unQuart + deuxQuart
+print(resultat)
+
+#as_mixed_number :
+test2 = Fraction(-5, 2)
+print(test2.as_mixed_number())
+
+#__sub__ :
+test3 = Fraction(5, 3)
+test4 = Fraction(2, 6)
+print(test3.__sub__(test4))
+
+#__pow__ :
+test = Fraction(-2, 3)
+print(test.__pow__(2))
+
+test5 = Fraction(-7, 3)
+
+
+
+#Héritage :
+class FractionUnDenominateur(Fraction):
+    def __init__(self, num, fixed_den = 1):
+        super().__init__(num, fixed_den = 1)
