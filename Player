@@ -1,0 +1,59 @@
+from classes.Character import Character
+
+objetEquipable = ["couteau", "épée"]
+
+
+class Player(Character):
+    def __init__(self, name, health, attack_power):
+        """
+        Initialisation du joueur avec un inventaire
+        """
+        super().__init__(name, health, attack_power)
+        self.inventory = []
+        self.main = []
+
+    def add_to_inventory(self, item):
+        """
+        Ajoute un objet à l'inventaire
+        """
+        self.inventory.append(item)
+        print(f"{item} ajouté à l'inventaire.")
+
+    def remove_from_inventory(self, item):
+        """
+        Retire un objet de l'inventaire
+        """
+        if item in self.inventory:
+            self.inventory.remove(item)
+            print(f"{item} retiré de l'inventaire.")
+        else:
+            print(f"{item} n'est pas dans l'inventaire.")
+
+    def get_inventory(self):
+        """
+        Affiche l'inventaire du joueur
+        """
+        if not self.inventory:
+            print("inventaire mal initialisé")
+        else: show_inventory(self.inventory)
+
+    def save(self):
+        """
+        Placeholder pour la sauvegarde de la partie
+        """
+        print("Sauvegarde non implémentée.")
+
+
+def show_inventory(inventory):
+    actions = ["équiper", "déséquiper", "utiliser"]
+    print(inventory)
+    print("Que voulez-vous faire dans l'invenraire?")
+    userInput = ""
+    while userInput not in actions:
+        if userInput == "équiper":
+            print("équiper quel objet ?")
+            objetInput = ""
+            if objetInput not in objetEquipable:
+                print("vous ne pouvez pas équiper cet objet")
+            else : print(f"{objetInput} est équipé en main")
+
