@@ -1,0 +1,143 @@
+from classes.Character import Character
+from classes.Player import Player
+import classes.NPC
+import classes.Item
+import classes.Location
+import classes.TextLibrary
+
+visited_places = {
+    "salle_buffet": False,
+    "cuisine": False
+}
+
+def show_inventory(inventory):
+    print(inventory)
+
+def combat(player, enemy):
+    """
+    Gère un combat entre le joueur et un ennemi
+    """
+    print("Début du combat !")
+
+    while player.is_alive() and enemy.is_alive():
+        # Attaque du joueur
+        attack_result = player.deal_attack(enemy)
+        print(attack_result)
+
+        # Vérifier si l'ennemi est mort
+        if not enemy.is_alive():
+            print(f"Vous avez vaincu {enemy.name} !")
+            return True
+
+        # Contre-attaque de l'ennemi
+        enemy_attack = enemy.deal_attack(player)
+        print(enemy_attack)
+
+        # Afficher l'état des personnages
+        print(f"{player}\n{enemy}")
+
+        # Demander une action au joueur
+        action = input("Que voulez-vous faire ? (continuer/fuir) ").lower()
+        if action == 'fuir':
+            print("Vous fuyez le combat !")
+            return False
+
+
+def introScene(player):
+  directions = ["forward"]
+  print("L'entrée d'ou vous venez est bloqué, il faut trouver un autre moyen de sortir ! Par ou aller vous ?")
+  userInput = ""
+  while userInput not in directions:
+    print("Options: forward")
+    userInput = input()
+    if userInput == "forward":
+      salleBuffet(player)
+    elif userInput == "backward":
+      print("L'entrée du chateau est bloqué")
+    else:
+      print("Please enter a valid option for the adventure game.")
+
+def salleBuffet(player):
+    directions = ["left", "right", "forward", "backward"]
+    print("Vous entrez dans une sublime salle des buffet qui ne trahis pas la richesse que l'ancien propriétaire gardait. Des tableaux, des toiles, de l'or, de quoi en mettre plein la vue a n'importe qui.")
+    print("vous remarqué une fiole dont le contenue rougatre vous dit qu'elle pourrait être utile.")
+    player.add_to_inventory("Potion")
+    print("Par ou aller vous ? Que voulez vous faire?")
+    userInput = ""
+    while userInput not in directions:
+        print("Options: left/right/backward/forward ou inventaire")
+        userInput = input()
+        if userInput == "left":
+            cuisine(player)
+        elif userInput == "right":
+            showSkeletons(player)
+        elif userInput == "forward":
+            hauntedRoom(player)
+        elif userInput == "backward":
+            introScene(player)
+        elif userInput == "inventaire" :
+            player.get_inventory()
+
+def cuisine(player):
+    """
+    Scène du garde-manger avec un combat
+
+    """
+    if visited_places["cuisine"]:
+        print("Vous êtes déjà venu ici. La cuisine est vide.")
+        salleBuffet(player)
+
+    visited_places["cuisine"] = True
+
+    print("En entrant dans ce qui semble être la cuisine, vous sentez une présence.")
+    print("Un petit gobelin apparaît derrière vous et vous bloque le chemin. Pas le choix, il faut se battre !")
+
+    # Créer un ennemi pour le combat
+    enemy = Character("Gobelin", health=15, attack_power=3)
+
+    # Lancer le combat
+    if combat(player, enemy):  # Si le combat est gagné
+        print("Vous avez accès a la cuisine après avoir vaincu le gobelin.")
+        print("Vous trouvez des provisions et un couteau de cuisine.")
+        player.add_to_inventory("Provisions")
+        player.add_to_inventory("Couteau")
+        directions = ["backward"]
+        print("Par ou aller vous ? Que voulez-vous faire?")
+        userInput = ""
+        while userInput not in directions:
+            print("Options: backward ou inventory")
+            userInput = input()
+            if userInput == "backward":
+                salleBuffet(player)
+            elif userInput == "inventory":
+                player.get_inventory()
+
+
+
+    else:  # Si le joueur fuit ou perd
+        print("Vous quittez la cuisine.")
+        salleBuffet(player)
+
+
+
+def main():
+    """
+    Fonction principale du jeu
+    """
+    print("Bienvenue dans le Jeu d'Aventure !")
+    print("En tant que voyageur intrépide, vous vous êtes aventuré dans les Catacombes de Paris.")
+    print("Mais au cours de votre exploration, vous vous retrouvez perdu.")
+    print("Vous pouvez choisir de vous déplacer dans différentes directions pour trouver une sortie.")
+
+    # Demander le nom du joueur
+    name = input("Entrez votre nom : ")
+    print(f"Bonne chance, {name}.")
+
+    # Créer le joueur
+    player = Player(name, health=20, attack_power=5)
+
+    # Commencer le jeu
+    introScene(player)
+
+if __name__ == "__main__":
+    main()
