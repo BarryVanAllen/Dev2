@@ -1,0 +1,363 @@
+from classes.Character import Character
+from classes.Player import Player
+from classes.NPC import NPC
+from classes.Item import Item
+import classes.Location
+import classes.TextLibrary
+from classes.Narator import NaratorFunc
+
+visited_places = {
+    "salle_buffet": False,
+    "cuisine": False,
+    "bibli": False,
+    "couloir": False,
+    "cave": False,
+    "couloirCaverne": False
+}
+
+
+# Partie logique
+
+def equip_item(player):
+    #mettre print
+    # Display available items and let the player equip one
+    for i, item in enumerate(player.inventory):
+        print(f"{i + 1}. {item.name}")
+    choice = int(input("> ")) - 1
+    if 0 <= choice < len(player.inventory):
+        item = player.inventory[choice]
+        player.equip(item)  # Assuming an equip method in Player class
+        #ancien print
+
+
+# fonction à appeler quand il y a un combat
+def combat(player, enemy):
+    #combat1
+    # combat2
+    # combat_commence
+
+    while player.is_alive() and enemy.is_alive():
+        # Attaque du joueur
+        #attaque_joueur
+        attack_result = player.deal_attack(enemy)
+        print(attack_result)
+
+        # Vérifier si l'ennemi est mort
+        if not enemy.is_alive():
+            #ennemie_vaincu
+            return True
+
+        # Contre-attaque de l'ennemi
+        #contre_attaque
+        enemy_attack = enemy.deal_attack(player)
+        print(enemy_attack)
+
+        # Afficher l'état des personnages
+        #etat_des_perso
+
+        # Demander une action au joueur
+        action = print("") #actionFuirOuContinuer
+        if action == "fuir":
+            #fuir
+            return False
+
+
+# fonction pour montrer l'inventaire
+def show_inventory(inventory):
+    if not inventory:
+        return
+
+    for item in inventory:
+        print(f"- {item}")
+    actions = ["équiper", "déséquiper", "utiliser", "quitter"]
+    user_action = ""
+    while user_action not in actions:
+        #action_option
+        user_action = input("> ").strip().lower()
+
+    if user_action == "équiper":
+        equip_item(player)
+    elif user_action == "déséquiper":
+        #desequiper
+        pass;
+    elif user_action == "utiliser":
+        #utiliser
+        pass;
+    elif user_action == "quitter":
+        #quitter
+        pass;
+
+
+# début du jeu
+def introScene(player):
+    directions = ["forward"]
+    #bloc_entrance
+   userInput = ""
+    while userInput not in directions:
+        #option
+        userInput = input()
+        if userInput == "forward":
+            salleBuffet(player)
+        elif userInput == "backward":
+            #block_entrance
+        else:
+            #invalid_input
+
+
+# fonction à appeler quand on va dans la salle de buffet
+def salleBuffet(player):
+    potion = Item("Potion de vie", 0, 5)
+    player.add_to_inventory(potion)
+
+    directions = ["left", "right", "forward", "backward"]
+    while True:
+        userInput = input("> ").strip().lower()
+        if userInput == "left":
+            cuisine(player)
+        elif userInput == "right":
+            couloir1(player)
+        elif userInput == "forward":
+            bibli(player)
+        elif userInput == "backward":
+            introScene(player)
+        elif userInput == "inventaire":
+            player.get_inventory()
+
+
+# fonction à appeler quand on va dans la cuisine
+def cuisine(player):
+    """
+    Scène immersive dans la cuisine avec un combat
+    """
+    if visited_places["cuisine"]:
+        salleBuffet(player)
+
+    visited_places["cuisine"] = True
+
+    # ancien print
+
+    # Création de l'ennemi
+    enemy = Character("Gobelin", health=15, attack_power=3)
+
+    # Lancer le combat
+    if combat(player, enemy):  # Si le combat est gagné
+
+        couteau = Item("Couteau de cuisine", 5, 0)
+        provisions = Item("Provisions", 0, 5)
+        player.add_to_inventory(provisions)
+        player.add_to_inventory(couteau)
+
+        directions = ["backward"]
+        while True:
+
+            userInput = input("> ").strip().lower()
+            if userInput == "backward":
+                #retourne_buffet
+                salleBuffet(player)
+            elif userInput == "inventaire":
+                player.get_inventory()
+            else:
+                #option_invalide
+    else:  # Si le joueur fuit ou perd
+        #battre_retraite
+        salleBuffet(player)
+
+
+def couloir1(player):
+    if visited_places["couloir"] == True:
+        pass;
+
+    else:
+
+        # Demander si le joueur veut résoudre l'énigme ou non
+        choix_énigme = input(NaratorFunc("demande_engime")).strip().lower()
+
+        if choix_énigme != "oui":
+            # ancien print
+
+            # ancien print
+            choix_direction(player)
+            return
+
+        tableaux = ["Tableau 1", "Tableau 2", "Tableau 3", "Tableau 4"]
+        solution = [3, 1, 4, 2]  # Ordre correct pour réaligner les tableaux
+        essais = []
+        tentatives = 0
+
+        while essais != solution:
+            #tableau_etat
+            print(", ".join([f"{t} (désaligné)" for t in tableaux]))
+
+            #tableau_realigner
+            try:
+                choix = input("> ")
+                essais = list(map(int, choix.split()))
+            except ValueError:
+                #valueError
+                continue
+
+            tentatives += 1
+
+            if essais == solution:
+                #solution_enigme1
+                #solution_enigme2
+                #coffre_epee
+                epee = Item("épée", 8, 0)
+                player.add_to_inventory(epee)
+                visited_places["couloir"] = True
+                break
+
+            elif len(essais) != len(solution):
+                #tableau_rater
+                pass;
+            else:
+                #ordre_incorrect
+                pass;
+
+        if tentatives > 5:
+            #tentatives_5
+
+        # À la fin de l'énigme, ou si l'énigme n'est pas résolue, demander où aller
+        choix_direction(player)
+
+
+def choix_direction(player):
+    """
+    Permet de choisir où aller après l'énigme.
+    """
+    directions = ["forward", "backward", "right"]
+    userInput = ""
+    while userInput not in directions:
+        #option
+        userInput = input("> ").strip().lower()
+        if userInput == "forward":
+            #avance_prudament
+            salleMort(player)
+        elif userInput == "backward":
+            salleBuffet(player)
+
+        elif userInput == "right":
+            #droite
+            cave(player)
+
+
+def bibli(player):
+    """
+    Scène de la bibliothèque avec rencontre d'un fantôme et un avertissement pour éviter de mourir ici.
+    """
+    if visited_places["bibli"] == True:
+        #bibli_sans_fantome
+    else:
+        #bibli
+
+        # Offrir des options pour continuer l'aventure
+        directions = ["left", "right", "forward", "backward"]
+        userInput = ""
+        while userInput not in directions:
+            #options
+            userInput = input()
+            if userInput == "left":
+                cuisine(player)
+            elif userInput == "right":
+                couloir1(player)
+            elif userInput == "backward":
+                salleBuffet(player)
+            elif userInput == "inventaire":
+                player.get_inventory()  # Voir l'inventaire
+
+
+def cave(player):
+    if visited_places["cave"] == True:
+        #cave_visite
+        userInput = input()
+        if userInput == "oui":
+            couloirCaverne(player)
+        else:
+            print("vous retourner dans le couloir")
+            couloir1(player)
+    else:
+        #cave
+
+        enigmes = [
+            {
+                "question": "Je colle éternellement et rien n'empêchera mon arrivée. Tout me fuit, mais tout passe en moi. Qui suis-je ?",
+                "reponse": ["le temps", "temps"],
+                "effet": "Les murs autour de vous semblent vieillir et se fissurer, comme si des siècles s'étaient écoulés en un instant."
+            },
+            {
+                "question": "Petit, je donne du plaisir, mais grand, je détruis des villes. Mon amour est la lune, et mon désir est la mer. Qui suis-je ?",
+                "reponse": ["les vagues", "vague", "une vague"],
+                "effet": "Une goutte froide tombe sur votre épaule depuis le plafond, et un bruit d'eau se fait entendre au loin."
+            },
+            {
+                "question": "Je brûle comme le feu ou je mijote sous la peau. Je vise la justice, mais souvent, je suis trompeuse. Qui suis-je ?",
+                "reponse": ["la colère", "colère"],
+                "effet": "Les murs s'effondrent soudainement, et une masse d'eau vous emporte avec violence vers une grotte sombre."
+            }
+        ]
+
+        for i, enigme in enumerate(enigmes, start=1):
+            print(f"\nÉnigme {i} :")
+            print(f'"{enigme["question"]}"\n')
+
+            tentative = input("> ").strip().lower()
+            if tentative in enigme["reponse"]:
+                print("\nBonne réponse !")
+                print(enigme["effet"])
+            else:
+                #reponse_mauvaise_sphinx
+
+        #effet_cave
+
+        visited_places["cave"] = True
+
+        directions = ["left", "right", "forward", "backward"]
+        userInput = ""
+        while userInput not in directions:
+           #option
+            userInput = input()
+            if userInput == "forward":
+                couloirCaverne(player)
+            if userInput == "inventaire":
+                player.get_inventory()  # Voir l'inventaire
+
+
+def couloirCaverne(player):
+    if visited_places["couloirCaverne"] == True:
+
+    enemy = Character("Araignée", 15, 4)
+    if combat(player, enemy):
+
+            #combat_araigne_gagne
+
+        clé = Item("Clé de l'araignée", 0, 0)
+        player.add_to_inventory(clé)
+
+
+def chambre(player):
+    pass;
+
+
+def salleMort(player):
+    pass
+
+
+# fonction qui lance le jeu
+def main():
+    """
+    Fonction principale du jeu
+    """
+
+    # Demander le nom du joueur
+    name = input("Entrez votre nom : ")
+    print(f"Bonne chance, {name}. Vous allez en avoir besoin.")
+
+    # Créer le joueur
+    player = Player(name, health=20, attack_power=5)
+
+    # Commencer le jeu
+    introScene(player)
+
+
+if __name__ == "__main__":
+    main()
